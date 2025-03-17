@@ -186,45 +186,37 @@
       background-color: #f9f9f9;
     }
     
-    /* Responsive styles */
+    /* Mobile responsiveness improvements */
     @media (max-width: 768px) {
       .dashboard {
         grid-template-columns: 1fr;
         gap: 20px;
       }
-    
-      h1 {
-        font-size: 30px;
+      .tank-container, .main-content {
+        width: 95%;
+        margin: 0 auto;
       }
-    
-      .tank-container {
-        padding: 15px;
-      }
-    
       .tank {
-        width: 200px;
-        height: 280px;
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        aspect-ratio: 240 / 340; /* maintain proportion */
       }
-    
-      .tab-nav {
-        justify-content: center;
+      h1 {
+        font-size: 28px;
       }
-    
-      .tab-button {
-        padding: 8px 16px;
-        font-size: 12px;
-      }
-    
       #stats p {
         font-size: 14px;
       }
-    
-      .chart-container {
-        padding: 15px;
+      .tab-button {
+        padding: 8px;
+        font-size: 12px;
       }
-    
+      .chart-container, .tab-container {
+        padding: 10px;
+      }
       #historyTable th, #historyTable td {
-        font-size: 14px;
+        font-size: 12px;
       }
     }
     
@@ -232,37 +224,28 @@
       h1 {
         font-size: 24px;
       }
-    
       .tank-container {
-        width: 300px;
-        height: 440px;
+        padding: 10px;
+        width: 100%;
       }
-    
       .tank {
-        width: 160px;
-        height: 240px;
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        aspect-ratio: 240 / 340;
       }
-    
       #stats p {
         font-size: 12px;
       }
-    
       .tab-button {
-        padding: 6px 12px;
+        padding: 6px;
         font-size: 10px;
       }
-    
       .tab-container {
         padding: 10px;
-        width: 330px;
       }
-    
       #historyTable th, #historyTable td {
-        font-size: 12px;
-      }
-    
-      .chart-container {
-        padding: 10px;
+        font-size: 10px;
       }
     }
   </style>
@@ -331,7 +314,7 @@
       document.getElementById('currentDistance').textContent = data.distance.toFixed(1);
       document.getElementById('currentLevel').textContent = waterLevel.toFixed(1);
       
-      // Convert the received timestamp to Sri Lankan (Asia/Colombo) time.
+      // Convert the server timestamp (UTC) to Asia/Colombo time.
       const localTimestamp = moment.tz(data.timestamp, "Asia/Colombo").format('YYYY-MM-DD HH:mm:ss');
       document.getElementById('timestamp').textContent = localTimestamp;
       
