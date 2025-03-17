@@ -6,6 +6,8 @@
   <title>Water Tank Monitoring</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+  <!-- Include moment-timezone for timezone support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
   <style>
     :root {
       --primary-color: #2196F3;
@@ -106,8 +108,14 @@
       transition: background-color 0.3s ease;
     }
     
-    .bulb.on {
-      background-color: #4CAF50; /* on state (green) */
+    /* Green indicator on */
+    .bulb.on-green {
+      background-color: #4CAF50;
+    }
+    
+    /* Red indicator on */
+    .bulb.on-red {
+      background-color: #F44336;
     }
     
     .tab-container {
@@ -322,21 +330,29 @@
       document.getElementById('waterLevel').style.height = `${waterHeight}%`;
       document.getElementById('currentDistance').textContent = data.distance.toFixed(1);
       document.getElementById('currentLevel').textContent = waterLevel.toFixed(1);
-      document.getElementById('timestamp').textContent = data.timestamp;
       
-      // Update motor indicator bulbs: if water level is below 12cm, motor is on.
+      // Convert the received timestamp to Sri Lankan (Asia/Colombo) time.
+      const localTimestamp = moment.tz(data.timestamp, "Asia/Colombo").format('YYYY-MM-DD HH:mm:ss');
+      document.getElementById('timestamp').textContent = localTimestamp;
+      
+      // Update motor indicator bulbs:
+      // Motor is on if water level is below 12 cm.
       if (waterLevel < 12) {
-        document.getElementById('motorIndicator1').classList.add('on');
-        document.getElementById('motorIndicator2').classList.add('on');
+        // Motor on: Green indicator on, red indicator off.
+        document.getElementById('motorIndicator1').classList.add('on-green');
+        document.getElementById('motorIndicator2').classList.remove('on-red');
       } else {
-        document.getElementById('motorIndicator1').classList.remove('on');
-        document.getElementById('motorIndicator2').classList.remove('on');
+        // Motor off: Red indicator on, green indicator off.
+        document.getElementById('motorIndicator1').classList.remove('on-green');
+        document.getElementById('motorIndicator2').classList.add('on-red');
       }
     }
     
     function updateChart(history) {
       const ctx = document.getElementById('historyChart').getContext('2d');
-      const labels = history.map(entry => entry.timestamp.split(' ')[1]);
+      const labels = history.map(entry =>
+        moment.tz(entry.timestamp, "Asia/Colombo").format('HH:mm:ss')
+      );
       const data = history.map(entry => tankHeight - entry.distance);
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
@@ -361,7 +377,8 @@
       const tableBody = document.getElementById('historyTableBody');
       tableBody.innerHTML = '';
       history.forEach(entry => {
-        const row = `<tr><td>${entry.timestamp}</td><td>${(tankHeight - entry.distance).toFixed(1)}</td></tr>`;
+        const localTime = moment.tz(entry.timestamp, "Asia/Colombo").format('YYYY-MM-DD HH:mm:ss');
+        const row = `<tr><td>${localTime}</td><td>${(tankHeight - entry.distance).toFixed(1)}</td></tr>`;
         tableBody.innerHTML += row;
       });
     }
